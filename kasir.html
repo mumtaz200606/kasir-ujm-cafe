@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☕ Cafe POS & Cetak Struk</title>
+    <style>
+        /* --- CSS STYLING (Tema Kafe Modern Berdasarkan Logo The UJM Cafe) --- */
+        :root {
+            --primary-color: #F3C623;
+            /* Emas Terang dari Logo */
+            --accent-color: #CBB26A;
+            /* Emas Muted/Garis Tepi dari Logo */
+            --dark-bg: #22252A;
+            /* Hitam Arang dari isi tulisan UJM */
+            --white: #FFFFFF;
+            --danger: #d9534f;
+            --success: #5CB85C;
+            --info: #0275d8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-image: url('bg_cafe.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: rgba(34, 37, 42, 0.95);
+            color: var(--primary-color);
+            text-align: center;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .main-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .menu-section,
+        .cart-section,
+        .report-section {
+            background: rgba(34, 37, 42, 0.85);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(203, 178, 106, 0.3);
+            color: var(--white);
+        }
+
+        .menu-section {
+            flex: 3;
+            min-width: 350px;
+        }
+
+        .cart-section {
+            flex: 2;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .report-section {
+            flex: 1 1 100%;
+            margin-top: 10px;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            color: var(--dark-bg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-card:hover {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(243, 198, 35, 0.4);
+            border-color: var(--white);
+        }
+
+        .menu-card:hover .menu-price {
+            color: #000000;
+        }
+
+        .menu-price {
+            color: #947403;
+            font-size: 14px;
+            margin-top: 5px;
+            transition: color 0.2s ease;
+        }
+
+        .cart-table-container,
+        .report-table-container {
+            overflow-y: auto;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .cart-table-container {
+            max-height: 300px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        td {
+            color: var(--white);
+        }
+
+        .checkout-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            color: var(--dark-bg);
+        }
+
+        .row-billing {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .total-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .input-bayar {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            border: 2px solid var(--dark-bg);
+            border-radius: 6px;
+            text-align: right;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button.action-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-reset {
+            background-color: var(--danger);
+        }
+
+        .btn-bayar {
+            background-color: var(--success);
+        }
+
+        /* Tombol Laporan */
+        .btn-report-group {
+            float: right;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-cetak-laporan {
+            background-color: var(--info);
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .btn-clear-db {
+            background-color: #555;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+        }
+
+        /* --- STYLING KHUSUS CETAK STRUK & LAPORAN (PRINT CSS) --- */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #area-struk,
+            #area-struk * {
+                visibility: visible;
+            }
+
+            #area-struk {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 58mm;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 12px;
+                color: #000;
+                background: #fff;
+                padding: 5px;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        #area-struk {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="no-print" style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+        <img src="ujm.png" alt="Logo" style="height: 45px; width: auto; border-radius: 6px; object-fit: contain;">
+        THE UJM CAFE
+    </header>
+
+    <div class="main-container no-print">
+        <div class="menu-section">
+            <div class="menu-title">Silahkan Pilih Menu</div>
+            <div class="menu-grid" id="menu-container"></div>
+        </div>
+
+        <div class="cart-section">
+            <div class="menu-title">Keranjang Belanja</div>
+            <div class="cart-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Menu</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items"></tbody>
+                </table>
+            </div>
+
+            <div class="checkout-box">
+                <div class="row-billing">
+                    <span><strong>TOTAL:</strong></span>
+                    <span class="total-price" id="text-total">Rp 0</span>
+                </div>
+                <div class="row-billing" style="flex-direction: column; gap: 5px;">
+                    <label><strong>Uang Tunai (Rp):</strong></label>
+                    <input type="text" id="input-tunai" class="input-bayar" placeholder="0"
+                        oninput="formatDanHitung(this)">
+                </div>
+                <div class="row-billing" style="margin-top: 10px;">
+                    <span>Kembalian:</span>
+                    <span id="text-kembalian" style="font-weight: bold;">Rp 0</span>
+                </div>
+
+                <div class="btn-group">
+                    <button class="action-btn btn-reset" onclick="resetKasir()">Reset</button>
+                    <button class="action-btn btn-bayar" onclick="prosesPembayaran()">Bayar & Cetak</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <div class="menu-title">
+                Database Laporan Pendapatan Harian
+                <div class="btn-report-group">
+                    <button class="btn-cetak-laporan" onclick="cetakLaporanHariIni()">Cetak Pendapatan Hari
+                        Ini</button>
+                    <button class="btn-clear-db" onclick="hapusDatabase()">Hapus Riwayat</button>
+                </div>
+            </div>
+            <div class="report-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th style="color: #f0efeb; font-size: 16px;">Total Pendapatan Harian</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-items"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="area-struk"></div>
+
+    <script>
+        // DATA PRODUK KAFE (Murni nama dan harga jual saja)
+        const daftarMenu = [
+            { id: 1, nama: "Kopi Susu Aren", harga: 22000 },
+            { id: 2, nama: "Americano", harga: 18000 },
+            { id: 3, nama: "Cafe Latte", harga: 25000 },
+            { id: 4, nama: "Matcha Latte", harga: 26000 },
+            { id: 5, nama: "Croissant", harga: 15000 },
+            { id: 6, nama: "French Fries", harga: 18000 },
+            { id: 7, nama: "Roti Bakar", harga: 20000 }
+        ];
+
+        let keranjang = {};
+        let totalHarga = 0;
+
+        // Render Menu ke Grid HTML
+        const menuContainer = document.getElementById('menu-container');
+        daftarMenu.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'menu-card';
+            card.innerHTML = `${item.nama} <div class="menu-price">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
+            card.onclick = () => tambahKeKeranjang(item);
+            menuContainer.appendChild(card);
+        });
+
+        function tambahKeKeranjang(item) {
+            if (keranjang[item.id]) {
+                keranjang[item.id].qty += 1;
+                keranjang[item.id].subtotal = keranjang[item.id].qty * item.harga;
+            } else {
+                keranjang[item.id] = {
+                    nama: item.nama,
+                    harga: item.harga,
+                    qty: 1,
+                    subtotal: item.harga
+                };
+            }
+            updateTampilanKeranjang();
+        }
+
+        function updateTampilanKeranjang() {
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            totalHarga = 0;
+
+            Object.values(keranjang).forEach(item => {
+                totalHarga += item.subtotal;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.nama}</td>
+                    <td style="text-align:center;">${item.qty}</td>
+                    <td>Rp ${item.subtotal.toLocaleString('id-ID')}</td>
+                `;
+                cartItems.appendChild(row);
+            });
+
+            document.getElementById('text-total').innerText = `Rp ${totalHarga.toLocaleString('id-ID')}`;
+            const inputTunai = document.getElementById('input-tunai');
+            formatDanHitung(inputTunai);
+        }
+
+        function formatDanHitung(element) {
+            let valueBersih = element.value.replace(/[^\d]/g, "");
+            if (valueBersih === "") {
+                element.value = "";
+                hitungKembalian(0);
+                return;
+            }
+            let angkaInt = parseInt(valueBersih);
+            element.value = angkaInt.toLocaleString('id-ID');
+            hitungKembalian(angkaInt);
+        }
+
+        function hitungKembalian(tunai) {
+            const kembalian = tunai - totalHarga;
+            if (kembalian >= 0 && totalHarga > 0) {
+                document.getElementById('text-kembalian').innerText = `Rp ${kembalian.toLocaleString('id-ID')}`;
+                document.getElementById('text-kembalian').style.color = "green";
+            } else {
+                document.getElementById('text-kembalian').innerText = `Rp 0`;
+                document.getElementById('text-kembalian').style.color = "red";
+            }
+        }
+
+        function resetKasir() {
+            keranjang = {};
+            totalHarga = 0;
+            document.getElementById('input-tunai').value = '';
+            updateTampilanKeranjang();
+        }
+
+        // --- DATABASE LOGIC (LOCAL STORAGE PENDAPATAN) ---
+        function getFormatTanggalHariIni() {
+            return new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function simpanPendapatanKeDatabase(omset) {
+            const hariIni = getFormatTanggalHariIni();
+            let dbLaporan = JSON.parse(localStorage.getItem('db_ujm_pendapatan')) || {};
+
+            if (dbLaporan[hariIni]) {
+                dbLaporan[hariIni].omset += omset;
+            } else {
+                dbLaporan[hariIni] = {
+                    omset: omset
+                };
+            }
+
+            localStorage.setItem('db_ujm_pendapatan', JSON.stringify(dbLaporan));
+            tampilkanLaporanDatabase();
+        }
+
+        function tampilkanLaporanDatabase() {
+            const reportItems = document.getElementById('report-items');
+            reportItems.innerHTML = '';
+
+            let dbLaporan = JSON.parse(localStorage.getItem('db_ujm_pendapatan')) || {};
+
+            if (Object.keys(dbLaporan).length === 0) {
+                reportItems.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#aaa;">Belum ada data penjualan.</td></tr>`;
+                return;
+            }
+
+            Object.keys(dbLaporan).reverse().forEach(tanggal => {
+                const data = dbLaporan[tanggal];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${tanggal}</strong></td>
+                    <td style="color:#F3C623; font-weight:bold; font-size:15px;">Rp ${data.omset.toLocaleString('id-ID')}</td>
+                `;
+                reportItems.appendChild(row);
+            });
+        }
+
+        // 🖨️ FUNGSI: CETAK TOTAL PENDAPATAN SAAT TUTUP CAFE
+        function cetakLaporanHariIni() {
+            let dbLaporan = JSON.parse(localStorage.getItem('db_ujm_pendapatan')) || {};
+            const hariIni = getFormatTanggalHariIni();
+            const dataHariIni = dbLaporan[hariIni];
+
+            if (!dataHariIni || dataHariIni.omset === 0) {
+                alert("Belum ada transaksi masuk pada hari ini. Laporan pendapatan tidak bisa dicetak!");
+                return;
+            }
+
+            const waktuCetak = new Date().toLocaleString('id-ID');
+
+            let laporanHtml = `
+                <div style="text-align: center; margin-bottom: 10px; font-family: 'Courier New', monospace;">
+                    <img src="ujm.png" alt="Logo" style="display: block; margin: 0 auto 8px auto; max-height: 40px; width: auto; filter: grayscale(100%);">
+                    <h3 style="margin: 0;">THE UJM CAFE</h3>
+                    <p style="margin: 4px 0; font-size:11px; font-weight:bold; letter-spacing:1px;">LAPORAN PENDAPATAN HARIAN</p>
+                    <p style="margin: 0; font-size:10px;">Tanggal: ${hariIni}</p>
+                    <p style="margin: 2px 0; font-size:9px; color:#555;">Waktu Tutup: ${waktuCetak}</p>
+                </div>
+                <p>--------------------------------</p>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin: 10px 0;">
+                    <span>TOTAL PENDAPATAN:</span>
+                    <span>Rp ${dataHariIni.omset.toLocaleString('id-ID')}</span>
+                </div>
+                <p>--------------------------------</p>
+                <div style="text-align: center; margin-top: 30px; font-size: 10px;">
+                    Laporan Tutup Toko Valid<br>Selesai & Disetujui
+                    <br><br><br><br>
+                    (..........................)<br>Kasir / Manajer
+                </div>
+                <br><br>
+            `;
+
+            const areaStruk = document.getElementById('area-struk');
+            areaStruk.innerHTML = laporanHtml;
+            areaStruk.style.display = 'block';
+
+            window.print(); // Jalankan proses printing
+
+            areaStruk.style.display = 'none';
+        }
+
+        function hapusDatabase() {
+            if (confirm("Apakah Anda yakin ingin menghapus riwayat pendapatan di database? Data tidak bisa dikembalikan.")) {
+                localStorage.removeItem('db_ujm_pendapatan');
+                tampilkanLaporanDatabase();
+            }
+        }
+
+        function prosesPembayaran() {
+            const inputRaw = document.getElementById('input-tunai').value;
+            const tunai = parseInt(inputRaw.replace(/[^\d]/g, "")) || 0;
+
+            if (totalHarga === 0) {
+                alert('Keranjang belanja masih kosong!');
+                return;
+            }
+            if (tunai < totalHarga) {
+                alert('Uang tunai tidak mencukupi!');
+                return;
+            }
+
+            const kembalian = tunai - totalHarga;
+            const waktu = new Date().toLocaleString('id-ID');
+
+            // Masukkan penjualan ke database omset harian
+            simpanPendapatanKeDatabase(totalHarga);
+
+            // --- STRUK PRINT PELANGGAN ---
+            let strukHtml = `
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <img src="ujm.png" alt="Logo" style="display: block; margin: 0 auto 8px auto; max-height: 40px; width: auto; filter: grayscale(100%);">
+                    <h3 style="margin: 0; font-family: 'Courier New', monospace;">THE UJM CAFE</h3>
+                    <p style="margin: 2px 0; font-size:10px;">Jl. Malioboro No. 123, Yogyakarta</p>
+                    <p style="margin: 0; font-size:10px;">${waktu}</p>
+                </div>
+                <p>--------------------------------</p>
+            `;
+
+            Object.values(keranjang).forEach(item => {
+                strukHtml += `
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>${item.nama}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size:11px; margin-bottom:4px;">
+                        <span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span>
+                        <span>Rp ${item.subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+
+            strukHtml += `
+                <p>--------------------------------</p>
+                <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                    <span>TOTAL:</span> <span>Rp ${totalHarga.toLocaleString('id-ID')}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>TUNAI:</span> <span>Rp ${tunai.toLocaleString('id-ID')}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>KEMBALI:</span> <span>Rp ${kembalian.toLocaleString('id-ID')}</span>
+                </div>
+                <p>--------------------------------</p>
+                <div style="text-align: center; margin-top: 10px; font-size: 10px;">
+                    Terima Kasih atas Kunjungan Anda!<br>Selamat Menikmati
+                </div>
+                <br><br> `;
+
+            const areaStruk = document.getElementById('area-struk');
+            areaStruk.innerHTML = strukHtml;
+            areaStruk.style.display = 'block';
+
+            window.print();
+
+            areaStruk.style.display = 'none';
+            resetKasir();
+        }
+
+        window.onload = tampilkanLaporanDatabase;
+    </script>
+</body>
+
+</html>
